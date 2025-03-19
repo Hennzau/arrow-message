@@ -1,0 +1,23 @@
+[workspace]
+members = [
+    "crates/arrow-message",
+    "crates/arrow-message-derive",
+    "crates/arrow-message-python",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+description = ""
+edition = "2024"
+documentation = ""
+license = "Apache-2.0"
+repository = "https://github.com/Hennzau/arrow-message"
+
+[workspace.dependencies]
+arrow = "54"
+miette = "7.5"
+thiserror = "2"
+
+arrow-message = { path = "crates/arrow-message" }
+arrow-message-derive = { path = "crates/arrow-message-derive" }
