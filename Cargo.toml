@@ -8,9 +8,9 @@ resolver = "2"
 
 [workspace.package]
 version = "0.1.0"
-description = ""
+description = "arrow-message implements a way to define structs according to the Arrow format"
 edition = "2024"
-documentation = ""
+documentation = "https://github.com/Hennzau/arrow-message"
 license = "Apache-2.0"
 repository = "https://github.com/Hennzau/arrow-message"
 
@@ -19,5 +19,5 @@ arrow = "54"
 miette = "7.5"
 thiserror = "2"
 
-arrow-message = { path = "crates/arrow-message" }
-arrow-message-derive = { path = "crates/arrow-message-derive" }
+arrow-message = { version = "0.1.0", path = "crates/arrow-message" }
+arrow-message-derive = { version = "0.1.0", path = "crates/arrow-message-derive" }

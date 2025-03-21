@@ -1,0 +1,19 @@
+name: Check UV
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build_and_test:
+    name: arrow-message-python - latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: "Setup Python"
+        run: uv python --directory crates/arrow-message-python install
+      - name: "Sync"
+        run: uv sync --directory crates/arrow-message-python --extra tests
+      - name: "Fmt"
+        run: uv run --directory crates/arrow-message-python ruff check

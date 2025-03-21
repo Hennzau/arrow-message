@@ -1,0 +1,28 @@
+name: Check Cargo
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  RUST_LOG: INFO
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_and_test:
+    name: arrow-message - latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r7kamura/rust-problem-matchers@v1
+
+      - name: "Check"
+        run: cargo check --all
+      - name: "Build  (Without Python dep as it is build with maturin)"
+        run: cargo build --all --exclude arrow-message-python
+      - name: "Test"
+        run: cargo test --all --exclude arrow-message-python
+      - name: "Clippy"
+        run: cargo clippy --all
+      - name: "Fmt"
+        run: cargo fmt --all -- --check
