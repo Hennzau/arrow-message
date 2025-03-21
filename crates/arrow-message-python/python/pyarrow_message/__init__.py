@@ -1,4 +1,4 @@
-from .pyarrow_message import *
+from .pyarrow_message import *  # noqa: F403
 
 import pyarrow as pa
 import numpy as np
