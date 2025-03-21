@@ -12,4 +12,4 @@ arrow.workspace = true
 miette.workspace = true
 thiserror.workspace = true
 
-arrow-message-derive.workspace = true
+arrow-message-derive = { workspace = true }
