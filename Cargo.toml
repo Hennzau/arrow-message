@@ -10,7 +10,7 @@ resolver = "2"
 version = "0.1.0"
 description = "arrow-message implements a way to define structs according to the Arrow format"
 edition = "2024"
-documentation = ""
+documentation = "https://github.com/Hennzau/arrow-message"
 license = "Apache-2.0"
 repository = "https://github.com/Hennzau/arrow-message"
 
