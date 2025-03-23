@@ -17,5 +17,4 @@ target/
 #.idea/
 
 pyrightconfig.json
-justfile
 uv.lock

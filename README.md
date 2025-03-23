@@ -62,6 +62,11 @@ You can see an expanded version without the Derive macro [here](crates/arrow-mes
 
 A python version [here](crates/arrow-message-python/examples/enum_inherit.py)
 
+```bash
+cargo run -p arrow-message --example derive
+cargo run -p arrow-message --example enum_derive
+```
+
 ```python
 from pyarrow_message import ArrowMessage
 from dataclasses import dataclass
