@@ -3,7 +3,7 @@
 #
 #    maturin generate-ci --manifest-path crates/arrow-message-python/Cargo.toml --output .github/workflows/release_pypi.yml github --zig
 #
-name: CI
+name: Release PyPi
 
 on:
   workflow_dispatch:
