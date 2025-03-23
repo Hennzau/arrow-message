@@ -62,11 +62,6 @@ You can see an expanded version without the Derive macro [here](crates/arrow-mes
 
 A python version [here](crates/arrow-message-python/examples/enum_inherit.py)
 
-```bash
-cargo run -p arrow-message --example derive
-cargo run -p arrow-message --example enum_derive
-```
-
 ```python
 from pyarrow_message import ArrowMessage
 from dataclasses import dataclass
@@ -119,6 +114,15 @@ if __name__ == "__main__":
     main()
 ```
 
+## Just run examples
+
+We use a `justfile` to run examples:
+
+```bash
+just example-derive-enum # rust enum_derive.rs example
+just example-derive-inherit # python enum_inherit.py example
+```
+
 # Features
 
 - [x] Fields supported
@@ -138,7 +142,7 @@ if __name__ == "__main__":
 
 # What's Next?
 
-- [ ] Think is Vec/List support is possible and if it's relevant.
+- [ ] Think about Vec/List support. is it possible and is it relevant?.
 - [ ] Improved error handling and validation: too much panic! in arrow that we must catch.
 - [ ] Make to python API fully Rust with PyO3 (may be hard because we use a lot of python runtime tricks)
 - [ ] Enhanced documentation and examples
