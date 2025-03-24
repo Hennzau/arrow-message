@@ -136,9 +136,9 @@ just example-derive-inherit # python enum_inherit.py example
   - [x] Optional enums that implement/inherit ArrowMessage
   - [?] ~Enums with variant that implements/inherit ArrowMessage? I don't think it's possible, as an ArrowMessage should know it's exact datatype layout at compile time (only Option that are represented as NullArray when on runtime the value is None)~
 
-- [ ] Operations supported
+- [x] Operations supported
   - [x] Into/From ArrayData
-  - [ ] ArrayData Flattening
+  - [x] ArrayData Flattening
 
 # What's Next?
 

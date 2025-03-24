@@ -1,4 +1,4 @@
-use crate::traits::ArrowMessage;
+use crate::traits::message::ArrowMessage;
 
 pub fn make_union_fields(
     name: impl Into<String>,

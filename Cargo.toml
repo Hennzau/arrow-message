@@ -18,7 +18,7 @@ repository = "https://github.com/Hennzau/arrow-message"
 arrow = "54"
 
 arrow-message.version = "0.1.4"
-
 arrow-message.path = "crates/arrow-message"
+
 arrow-message-derive.version = "0.1.4"
 arrow-message-derive.path = "crates/arrow-message-derive"
