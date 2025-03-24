@@ -34,7 +34,7 @@ pub fn extract_union_data<T: ArrowMessage>(
     field: &str,
     map: &std::collections::HashMap<String, usize>,
     children: &[arrow::array::ArrayRef],
-) -> miette::Result<T, arrow::error::ArrowError> {
+) -> arrow::error::Result<T> {
     use arrow::array::Array;
 
     T::try_from_arrow(
@@ -54,8 +54,7 @@ pub fn extract_union_data<T: ArrowMessage>(
     )
 }
 
-pub fn get_union_fields<T: ArrowMessage>()
--> miette::Result<arrow::datatypes::UnionFields, arrow::error::ArrowError> {
+pub fn get_union_fields<T: ArrowMessage>() -> arrow::error::Result<arrow::datatypes::UnionFields> {
     match T::field("").data_type() {
         arrow::datatypes::DataType::Union(fields, _) => Ok(fields.clone()),
         _ => Err(arrow::error::ArrowError::InvalidArgumentError(

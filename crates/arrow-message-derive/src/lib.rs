@@ -58,7 +58,7 @@ fn struct_derive(name: Ident, fields: Punctuated<Field, Comma>) -> TokenStream {
                 )
             }
 
-            fn try_from_arrow(data: arrow::array::ArrayData) -> Result<Self, arrow::error::ArrowError>
+            fn try_from_arrow(data: arrow::array::ArrayData) -> arrow::error::Result<Self>
             where
                 Self: Sized,
             {
@@ -69,7 +69,7 @@ fn struct_derive(name: Ident, fields: Punctuated<Field, Comma>) -> TokenStream {
                 })
             }
 
-            fn try_into_arrow(self) -> Result<arrow::array::ArrayRef, arrow::error::ArrowError> {
+            fn try_into_arrow(self) -> arrow::error::Result<arrow::array::ArrayRef> {
                 let union_fields = arrow_message::prelude::get_union_fields::<Self>()?;
 
                 make_union_array(
@@ -84,7 +84,7 @@ fn struct_derive(name: Ident, fields: Punctuated<Field, Comma>) -> TokenStream {
         impl TryFrom<arrow::array::ArrayData> for #name {
             type Error = arrow::error::ArrowError;
 
-            fn try_from(data: arrow::array::ArrayData) -> Result<Self, Self::Error> {
+            fn try_from(data: arrow::array::ArrayData) -> arrow::error::Result<Self> {
                 #name::try_from_arrow(data)
             }
         }
@@ -92,7 +92,7 @@ fn struct_derive(name: Ident, fields: Punctuated<Field, Comma>) -> TokenStream {
         impl TryFrom<#name> for arrow::array::ArrayData {
             type Error = arrow::error::ArrowError;
 
-            fn try_from(item: #name) -> Result<Self, Self::Error> {
+            fn try_from(item: #name) -> arrow::error::Result<Self> {
                 item.try_into_arrow().map(|array| array.into_data())
             }
         }
@@ -131,10 +131,10 @@ fn enum_derive(name: Ident, variants: Punctuated<Variant, Token![,]>) -> TokenSt
                 }
             }
 
-            pub fn try_from_string(s: String) -> miette::Result<Self, ArrowError> {
+            pub fn try_from_string(s: String) -> arrow::error::Result<Self> {
                 match s.as_str() {
                     #(#try_from_string_arms)*
-                    _ => Err(ArrowError::ParseError(format!("Invalid value for {}: {}", stringify!(#name), s))),
+                    _ => Err(arrow::error::ArrowError::ParseError(format!("Invalid value for {}: {}", stringify!(#name), s))),
                 }
             }
         }
@@ -144,14 +144,14 @@ fn enum_derive(name: Ident, variants: Punctuated<Variant, Token![,]>) -> TokenSt
                 String::field(name)
             }
 
-            fn try_from_arrow(data: arrow::array::ArrayData) -> miette::Result<Self, arrow::error::ArrowError>
+            fn try_from_arrow(data: arrow::array::ArrayData) -> arrow::error::Result<Self>
             where
                 Self: Sized,
             {
                 Encoding::try_from_string(String::try_from_arrow(data)?)
             }
 
-            fn try_into_arrow(self) -> miette::Result<arrow::array::ArrayRef, arrow::error::ArrowError> {
+            fn try_into_arrow(self) -> arrow::error::Result<arrow::array::ArrayRef> {
                 String::try_into_arrow(self.into_string())
             }
         }
@@ -160,7 +160,7 @@ fn enum_derive(name: Ident, variants: Punctuated<Variant, Token![,]>) -> TokenSt
         impl TryFrom<arrow::array::ArrayData> for #name {
             type Error = arrow::error::ArrowError;
 
-            fn try_from(data: arrow::array::ArrayData) -> Result<Self, Self::Error> {
+            fn try_from(data: arrow::array::ArrayData) -> arrow::error::Result<Self> {
                 #name::try_from_arrow(data)
             }
         }
@@ -168,7 +168,7 @@ fn enum_derive(name: Ident, variants: Punctuated<Variant, Token![,]>) -> TokenSt
         impl TryFrom<#name> for arrow::array::ArrayData {
             type Error = arrow::error::ArrowError;
 
-            fn try_from(item: #name) -> Result<Self, Self::Error> {
+            fn try_from(item: #name) -> arrow::error::Result<Self> {
                 item.try_into_arrow().map(|array| array.into_data())
             }
         }

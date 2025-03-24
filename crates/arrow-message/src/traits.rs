@@ -13,8 +13,8 @@ use arrow::{
 pub trait ArrowMessage {
     fn field(name: impl Into<String>) -> Field;
 
-    fn try_into_arrow(self) -> miette::Result<ArrayRef, ArrowError>;
-    fn try_from_arrow(data: ArrayData) -> miette::Result<Self, ArrowError>
+    fn try_into_arrow(self) -> arrow::error::Result<ArrayRef>;
+    fn try_from_arrow(data: ArrayData) -> arrow::error::Result<Self>
     where
         Self: Sized;
 }
@@ -27,14 +27,14 @@ where
         T::field(name).with_nullable(true)
     }
 
-    fn try_into_arrow(self) -> miette::Result<ArrayRef, ArrowError> {
+    fn try_into_arrow(self) -> arrow::error::Result<ArrayRef> {
         match self {
             Some(value) => value.try_into_arrow(),
             None => Ok(Arc::new(NullArray::new(0)) as ArrayRef),
         }
     }
 
-    fn try_from_arrow(data: ArrayData) -> miette::Result<Self, ArrowError>
+    fn try_from_arrow(data: ArrayData) -> arrow::error::Result<Self>
     where
         Self: Sized,
     {
@@ -53,11 +53,11 @@ where
         Field::new(name, T::DATA_TYPE, false)
     }
 
-    fn try_into_arrow(self) -> miette::Result<ArrayRef, ArrowError> {
+    fn try_into_arrow(self) -> arrow::error::Result<ArrayRef> {
         Ok(Arc::new(self) as ArrayRef)
     }
 
-    fn try_from_arrow(data: ArrayData) -> miette::Result<Self, ArrowError>
+    fn try_from_arrow(data: ArrayData) -> arrow::error::Result<Self>
     where
         Self: Sized,
     {
@@ -72,11 +72,11 @@ macro_rules! impl_arrow_field {
                 Field::new(name, $data_type, false)
             }
 
-            fn try_into_arrow(self) -> miette::Result<ArrayRef, ArrowError> {
+            fn try_into_arrow(self) -> arrow::error::Result<ArrayRef> {
                 Ok(Arc::new(<$array_type>::from(vec![self])) as ArrayRef)
             }
 
-            fn try_from_arrow(data: ArrayData) -> miette::Result<Self, ArrowError>
+            fn try_from_arrow(data: ArrayData) -> arrow::error::Result<Self>
             where
                 Self: Sized,
             {
@@ -109,11 +109,11 @@ impl ArrowMessage for String {
         Field::new(name, DataType::Utf8, false)
     }
 
-    fn try_into_arrow(self) -> miette::Result<ArrayRef, ArrowError> {
+    fn try_into_arrow(self) -> arrow::error::Result<ArrayRef> {
         Ok(Arc::new(StringArray::from(vec![self])) as ArrayRef)
     }
 
-    fn try_from_arrow(data: ArrayData) -> miette::Result<Self, ArrowError>
+    fn try_from_arrow(data: ArrayData) -> arrow::error::Result<Self>
     where
         Self: Sized,
     {
@@ -132,11 +132,11 @@ impl ArrowMessage for StringArray {
         Field::new(name, DataType::Utf8, false)
     }
 
-    fn try_into_arrow(self) -> miette::Result<ArrayRef, ArrowError> {
+    fn try_into_arrow(self) -> arrow::error::Result<ArrayRef> {
         Ok(Arc::new(self) as ArrayRef)
     }
 
-    fn try_from_arrow(data: ArrayData) -> miette::Result<Self, ArrowError>
+    fn try_from_arrow(data: ArrayData) -> arrow::error::Result<Self>
     where
         Self: Sized,
     {

@@ -23,9 +23,7 @@ struct Image {
     metadata: Option<Metadata>,
 }
 
-fn main() -> Result<()> {
-    use miette::IntoDiagnostic;
-
+fn main() -> arrow::error::Result<()> {
     let image = Image {
         data: UInt8Array::from(vec![1, 2, 3]),
         metadata: Some(Metadata {
@@ -38,8 +36,8 @@ fn main() -> Result<()> {
 
     println!("{:?}", image);
 
-    let arrow = ArrayData::try_from(image).into_diagnostic()?;
-    let image = Image::try_from(arrow).into_diagnostic()?;
+    let arrow = ArrayData::try_from(image)?;
+    let image = Image::try_from(arrow)?;
 
     println!("{:?}", image);
 

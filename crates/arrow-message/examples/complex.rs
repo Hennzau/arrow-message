@@ -24,9 +24,7 @@ struct Output {
     metadata: Metadata,
 }
 
-fn main() -> Result<()> {
-    use miette::IntoDiagnostic;
-
+fn main() -> arrow::error::Result<()> {
     let output = Output {
         first_array: UInt8Array::from(vec![1, 2, 3]),
         second_array: Float32Array::from(vec![4.0, 5.0, 6.0]),
@@ -44,10 +42,10 @@ fn main() -> Result<()> {
 
     println!("{:?}", output);
 
-    let arrow = ArrayData::try_from(output).into_diagnostic()?;
+    let arrow = ArrayData::try_from(output)?;
     println!("{:?}", arrow);
 
-    let output = Output::try_from(arrow).into_diagnostic()?;
+    let output = Output::try_from(arrow)?;
     println!("{:?}", output);
 
     Ok(())

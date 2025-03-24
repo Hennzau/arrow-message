@@ -16,11 +16,9 @@ repository = "https://github.com/Hennzau/arrow-message"
 
 [workspace.dependencies]
 arrow = "54"
-miette = "7.5"
-thiserror = "2"
 
 arrow-message.version = "0.1.3"
+arrow-message-derive.version = "0.1.3"
 
 arrow-message.path = "crates/arrow-message"
-arrow-message-derive.version = "0.1.3"
 arrow-message-derive.path = "crates/arrow-message-derive"

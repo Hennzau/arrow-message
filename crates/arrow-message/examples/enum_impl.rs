@@ -19,13 +19,13 @@ impl Encoding {
         }
     }
 
-    pub fn try_from_string(value: String) -> Result<Self, ArrowError> {
+    pub fn try_from_string(value: String) -> arrow::error::Result<Self> {
         match value.as_str() {
             "RGB8" => Ok(Encoding::RGB8),
             "RGBA8" => Ok(Encoding::RGBA8),
             "BGR8" => Ok(Encoding::BGR8),
             "BGRA8" => Ok(Encoding::BGRA8),
-            _ => Err(ArrowError::ParseError(format!(
+            _ => Err(arrow::error::ArrowError::ParseError(format!(
                 "Invalid encoding: {}",
                 value
             ))),
@@ -38,30 +38,27 @@ impl ArrowMessage for Encoding {
         String::field(name)
     }
 
-    fn try_from_arrow(data: ArrayData) -> miette::Result<Self, ArrowError>
-    where
-        Self: Sized,
-    {
+    fn try_from_arrow(data: ArrayData) -> arrow::error::Result<Self> {
         Encoding::try_from_string(String::try_from_arrow(data)?)
     }
 
-    fn try_into_arrow(self) -> miette::Result<ArrayRef, ArrowError> {
+    fn try_into_arrow(self) -> arrow::error::Result<ArrayRef> {
         String::try_into_arrow(self.into_string())
     }
 }
 
 impl TryFrom<ArrayData> for Encoding {
-    type Error = ArrowError;
+    type Error = arrow::error::ArrowError;
 
-    fn try_from(data: ArrayData) -> Result<Self, Self::Error> {
+    fn try_from(data: ArrayData) -> arrow::error::Result<Self> {
         Encoding::try_from_arrow(data)
     }
 }
 
 impl TryFrom<Encoding> for ArrayData {
-    type Error = ArrowError;
+    type Error = arrow::error::ArrowError;
 
-    fn try_from(metadata: Encoding) -> Result<Self, Self::Error> {
+    fn try_from(metadata: Encoding) -> arrow::error::Result<Self> {
         metadata.try_into_arrow().map(|array| array.into_data())
     }
 }
@@ -87,7 +84,7 @@ impl ArrowMessage for Metadata {
         )
     }
 
-    fn try_from_arrow(data: arrow::array::ArrayData) -> Result<Self, ArrowError>
+    fn try_from_arrow(data: arrow::array::ArrayData) -> arrow::error::Result<Self>
     where
         Self: Sized,
     {
@@ -101,7 +98,7 @@ impl ArrowMessage for Metadata {
         })
     }
 
-    fn try_into_arrow(self) -> Result<arrow::array::ArrayRef, ArrowError> {
+    fn try_into_arrow(self) -> arrow::error::Result<arrow::array::ArrayRef> {
         let union_fields = get_union_fields::<Self>()?;
 
         make_union_array(
@@ -117,17 +114,17 @@ impl ArrowMessage for Metadata {
 }
 
 impl TryFrom<ArrayData> for Metadata {
-    type Error = ArrowError;
+    type Error = arrow::error::ArrowError;
 
-    fn try_from(data: ArrayData) -> Result<Self, Self::Error> {
+    fn try_from(data: ArrayData) -> arrow::error::Result<Self> {
         Metadata::try_from_arrow(data)
     }
 }
 
 impl TryFrom<Metadata> for ArrayData {
-    type Error = ArrowError;
+    type Error = arrow::error::ArrowError;
 
-    fn try_from(metadata: Metadata) -> Result<Self, Self::Error> {
+    fn try_from(metadata: Metadata) -> arrow::error::Result<Self> {
         metadata.try_into_arrow().map(|array| array.into_data())
     }
 }
@@ -149,7 +146,7 @@ impl ArrowMessage for Image {
         )
     }
 
-    fn try_from_arrow(data: arrow::array::ArrayData) -> Result<Self, ArrowError>
+    fn try_from_arrow(data: arrow::array::ArrayData) -> arrow::error::Result<Self>
     where
         Self: Sized,
     {
@@ -161,7 +158,7 @@ impl ArrowMessage for Image {
         })
     }
 
-    fn try_into_arrow(self) -> Result<arrow::array::ArrayRef, ArrowError> {
+    fn try_into_arrow(self) -> arrow::error::Result<arrow::array::ArrayRef> {
         let union_fields = get_union_fields::<Self>()?;
 
         make_union_array(
@@ -172,24 +169,22 @@ impl ArrowMessage for Image {
 }
 
 impl TryFrom<ArrayData> for Image {
-    type Error = ArrowError;
+    type Error = arrow::error::ArrowError;
 
-    fn try_from(data: ArrayData) -> Result<Self, Self::Error> {
+    fn try_from(data: ArrayData) -> arrow::error::Result<Self> {
         Image::try_from_arrow(data)
     }
 }
 
 impl TryFrom<Image> for ArrayData {
-    type Error = ArrowError;
+    type Error = arrow::error::ArrowError;
 
-    fn try_from(image: Image) -> Result<Self, Self::Error> {
+    fn try_from(image: Image) -> arrow::error::Result<Self> {
         image.try_into_arrow().map(|array| array.into_data())
     }
 }
 
-fn main() -> Result<()> {
-    use miette::IntoDiagnostic;
-
+fn main() -> arrow::error::Result<()> {
     let image = Image {
         data: UInt8Array::from(vec![1, 2, 3]),
         metadata: Some(Metadata {
@@ -202,8 +197,8 @@ fn main() -> Result<()> {
 
     println!("{:?}", image);
 
-    let arrow = ArrayData::try_from(image).into_diagnostic()?;
-    let image = Image::try_from(arrow).into_diagnostic()?;
+    let arrow = ArrayData::try_from(image)?;
+    let image = Image::try_from(arrow)?;
 
     println!("{:?}", image);
 
