@@ -16,3 +16,6 @@ crate-type = ["cdylib"]
 arrow.workspace = true
 arrow.features = ["pyarrow"]
 pyo3 = "0.23.3"
+
+[package.metadata.release]
+release = false
