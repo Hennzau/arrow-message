@@ -25,7 +25,7 @@ struct Metadata {
     name: Option<String>,
     width: u32,
     height: u32,
-    encoding: Encoding,
+    encoding: Option<Encoding>,
 }
 
 #[derive(Debug, ArrowMessage)]
@@ -34,23 +34,21 @@ struct Image {
     metadata: Option<Metadata>,
 }
 
-fn main() -> Result<()> {
-    use miette::IntoDiagnostic;
-
+fn main() -> arrow::error::Result<()> {
     let image = Image {
         data: UInt8Array::from(vec![1, 2, 3]),
         metadata: Some(Metadata {
             name: Some("example".to_string()),
             width: 12,
             height: 12,
-            encoding: Encoding::RGB8,
+            encoding: Some(Encoding::RGB8),
         }),
     };
 
     println!("{:?}", image);
 
-    let arrow = ArrayData::try_from(image).into_diagnostic()?;
-    let image = Image::try_from(arrow).into_diagnostic()?;
+    let arrow = ArrayData::try_from(image)?;
+    let image = Image::try_from(arrow)?;
 
     println!("{:?}", image);
 

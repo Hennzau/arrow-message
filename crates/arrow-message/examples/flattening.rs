@@ -1,4 +1,3 @@
-
 use arrow::array::*;
 use arrow_message::prelude::*;
 
