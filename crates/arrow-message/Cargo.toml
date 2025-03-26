@@ -8,6 +8,12 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+serde.workspace = true
+serde.features = ["derive"]
+
 arrow.workspace = true
+
+arrow-schema.workspace = true
+arrow-schema.features = ["serde"]
 
 arrow-message-derive.workspace = true

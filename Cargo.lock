@@ -190,6 +190,8 @@ version = "0.1.4"
 dependencies = [
  "arrow",
  "arrow-message-derive",
+ "arrow-schema",
+ "serde",
 ]
 
 [[package]]
@@ -242,6 +244,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85934a9d0261e0fa5d4e2a5295107d743b543a6e0484a835d4b8db2da15306f9"
 dependencies = [
  "bitflags 2.9.0",
+ "serde",
 ]
 
 [[package]]

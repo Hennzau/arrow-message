@@ -112,6 +112,50 @@ if __name__ == "__main__":
     main()
 ```
 
+## Operations
+
+As you can see above, you can convert an ArrowMessage into an ArrayData. But it's also possible to operate on an ArrayData thanks to the trait `ArrayDataFlattening` to flatten an entire ArrayData in a single buffer, so it's easy to send the message through a protocol (SharedMemory, TCP etc...).
+
+```rust
+let arrow = ArrayData::try_from(image)?;
+let flat = arrow.flattened()?; // Copy of the data but flattened
+
+let image = Image::try_from(flat)?; // Always possible to convert back to Image
+```
+
+If you need to send the message through a protocol you can get both the Layout and the Buffer associated with the ArrayData:
+
+```rust
+let arrow = ArrayData::try_from(image)?;
+let (layout, values) = arrow.layout_with_values(); // (ArrayDataLayout, Buffer)
+let arrow = ArrayData::from_layout_and_values(layout, values)?;
+
+let image = Image::try_from(arrow)?;
+```
+
+*Note: ArrayDataLayout implements Serialize and Deserialize so you can send it over the network*
+
+In special cases you would like to write directly the values of the ArrayData into a custom buffer:
+
+```rust
+let arrow = ArrayData::try_from(image)?;
+
+let layout = arrow.layout();
+
+let size = arrow.required_size();
+let mut target = vec![0u8; size]; // Allocate a buffer of the required size
+arrow.fill(&mut target);
+
+// ...
+// Send (layout, target) and reconstruct an ArrayData
+// ...
+
+let values = arrow::buffer::Buffer::from_vec(target);
+let arrow = ArrayData::from_layout_and_values(layout, values)?;
+
+let image = Image::try_from(arrow)?;
+```
+
 ## Just run examples
 
 We use a `justfile` to run examples:
@@ -140,7 +184,7 @@ just example-derive-inherit # python enum_inherit.py example
 
 # What's Next?
 
-- [ ] Think about Vec/List support. is it possible and is it relevant?.
+- [?] ~Think about Vec/List support. is it possible and is it relevant?~.
 - [ ] Improved error handling and validation: too much panic! in arrow that we must catch.
 - [ ] Make to python API fully Rust with PyO3 (may be hard because we use a lot of python runtime tricks)
 - [ ] Enhanced documentation and examples

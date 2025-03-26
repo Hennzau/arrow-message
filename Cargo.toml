@@ -15,7 +15,10 @@ license = "Apache-2.0"
 repository = "https://github.com/Hennzau/arrow-message"
 
 [workspace.dependencies]
-arrow = "54"
+serde.version = "1"
+
+arrow.version = "54"
+arrow-schema.version = "54"
 
 arrow-message.version = "0.1.4"
 arrow-message.path = "crates/arrow-message"

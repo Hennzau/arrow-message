@@ -5,13 +5,15 @@ use arrow::{
     error::Result,
 };
 
-#[derive(Debug, Clone)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BufferOffset {
     pub len: usize,
     pub offset: usize,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ArrayDataLayout {
     pub data_type: DataType,
     pub len: usize,
@@ -25,10 +27,100 @@ pub trait ArrayDataFlattening {
     fn layout_with_values(&self) -> (ArrayDataLayout, Buffer);
     fn flattened(&self) -> Result<ArrayData>;
 
+    fn layout(&self) -> ArrayDataLayout;
+    fn required_size(&self) -> usize;
+    fn fill(&self, target: &mut [u8]);
+
     fn from_layout_and_values(layout: ArrayDataLayout, values: Buffer) -> Result<ArrayData>;
 }
 
 impl ArrayDataFlattening for ArrayData {
+    fn layout(&self) -> ArrayDataLayout {
+        fn layout_inner(array: &ArrayData, next_offset: &mut usize) -> ArrayDataLayout {
+            let mut buffers = Vec::new();
+            let mut child_data = Vec::new();
+
+            let layout = arrow::array::layout(array.data_type());
+
+            for (buffer, spec) in array.buffers().iter().zip(&layout.buffers) {
+                if let BufferSpec::FixedWidth { alignment, .. } = spec {
+                    *next_offset = (*next_offset).div_ceil(*alignment) * alignment;
+                }
+
+                buffers.push(BufferOffset {
+                    len: buffer.len(),
+                    offset: *next_offset,
+                });
+
+                *next_offset += buffer.len();
+            }
+
+            for child in array.child_data() {
+                child_data.push(layout_inner(child, next_offset));
+            }
+
+            ArrayDataLayout {
+                data_type: array.data_type().clone(),
+                len: array.len(),
+                null_bit_buffer: array.nulls().map(|b| b.validity().to_owned()),
+                offset: array.offset(),
+                buffers,
+                child_data,
+            }
+        }
+
+        let mut next_offset = 0;
+
+        layout_inner(self, &mut next_offset)
+    }
+
+    fn required_size(&self) -> usize {
+        fn required_size_inner(array: &ArrayData, next_offset: &mut usize) {
+            let layout = arrow::array::layout(array.data_type());
+
+            for (buffer, spec) in array.buffers().iter().zip(&layout.buffers) {
+                if let BufferSpec::FixedWidth { alignment, .. } = spec {
+                    *next_offset = (*next_offset).div_ceil(*alignment) * alignment;
+                }
+
+                *next_offset += buffer.len();
+            }
+
+            for child in array.child_data() {
+                required_size_inner(child, next_offset);
+            }
+        }
+
+        let mut next_offset = 0;
+        required_size_inner(self, &mut next_offset);
+
+        next_offset
+    }
+
+    fn fill(&self, target: &mut [u8]) {
+        fn fill_inner(array: &ArrayData, next_offset: &mut usize, target: &mut [u8]) {
+            let layout = arrow::array::layout(array.data_type());
+
+            for (buffer, spec) in array.buffers().iter().zip(&layout.buffers) {
+                if let BufferSpec::FixedWidth { alignment, .. } = spec {
+                    *next_offset = (*next_offset).div_ceil(*alignment) * alignment;
+                }
+
+                target[*next_offset..*next_offset + buffer.len()]
+                    .copy_from_slice(buffer.as_slice());
+                *next_offset += buffer.len();
+            }
+
+            for child in array.child_data() {
+                fill_inner(child, next_offset, target);
+            }
+        }
+
+        let mut next_offset = 0;
+
+        fill_inner(self, &mut next_offset, target);
+    }
+
     fn layout_with_values(&self) -> (ArrayDataLayout, Buffer) {
         fn layout_inner(
             array: &ArrayData,
