@@ -7,7 +7,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.1.4"
+version = "0.1.5"
 description = "arrow-message implements a way to define messages according to the Arrow format in both Rust and Python"
 edition = "2024"
 documentation = "https://github.com/Hennzau/arrow-message"
@@ -20,8 +20,8 @@ serde.version = "1"
 arrow.version = "54"
 arrow-schema.version = "54"
 
-arrow-message.version = "0.1.4"
+arrow-message.version = "0.1.5"
 arrow-message.path = "crates/arrow-message"
 
-arrow-message-derive.version = "0.1.4"
+arrow-message-derive.version = "0.1.5"
 arrow-message-derive.path = "crates/arrow-message-derive"
